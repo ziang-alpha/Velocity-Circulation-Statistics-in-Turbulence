@@ -12,7 +12,7 @@ function rectsloop(grid, heights, widths, startxs, startys)
 	return grid.rfftplan * hs
 end
 
-rectangle(height, width, startx, starty, grid) = @. (0 < (grid.x - startx) < width) && (0 < (grid.y-starty)' < height)
+rectangle(height, width, startx, starty, grid) = @. (0 ≤ (grid.x - startx) ≤ width) && (0 ≤ (grid.y-starty)' ≤ height)
 
 
 
