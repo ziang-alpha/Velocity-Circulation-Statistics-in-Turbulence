@@ -10,6 +10,7 @@ function rectsloop(grid, heights, widths, startxs, startys)
 	end
 	hs = device_array(grid)(hs)
 	return grid.rfftplan * hs
+	
 end
 
 rectangle(height, width, startx, starty, grid) = @. (0 ≤ (grid.x - startx) ≤ width) && (0 ≤ (grid.y-starty)' ≤ height)
