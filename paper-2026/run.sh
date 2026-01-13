@@ -1,3 +1,3 @@
 #!/bin/bash 
-DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-julia --project="${DIR}" "${DIR}/paper-2026/simulation.jl" $1 $2 $3 $4
+BASE_DIR="$HOME/Project/Velocity-Circulation-Statistics-in-Turbulence"
+julia --project="$BASE_DIR" "$BASE_DIR/paper-2026/simulation.jl" $1 $2 $3 $4

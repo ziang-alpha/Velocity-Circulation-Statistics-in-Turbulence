@@ -13,7 +13,7 @@ L  = 2π  # domain size
 kf = ngrid / (3 * sqrt(Re))       # Forcing wavenumber 
 ν  = ε^(1 / 3) * kf^(-4 / 3) / Re    # Viscosity
 
-dev = CPU() # Device of computation: GPU() or CPU()
+dev = GPU() # Device of computation: GPU() or CPU()
 
 output_path = PATH * "/.output/Re$(Re)_N$(ngrid).h5"   # path of the output file
 diag_path   = PATH * "/output/Re$(Re)_N$(ngrid)_diag.h5"

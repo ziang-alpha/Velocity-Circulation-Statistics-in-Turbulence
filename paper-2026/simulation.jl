@@ -1,4 +1,4 @@
-using GeophysicalFlows, Random, HDF5, ProgressMeter
+using GeophysicalFlows, Random, HDF5, ProgressMeter, CUDA
 
 include("parameters.jl")
 include("../core/diagnostics.jl")
