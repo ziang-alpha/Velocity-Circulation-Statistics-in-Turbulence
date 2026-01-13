@@ -1,4 +1,5 @@
-include("env_init.jl")
+using GeophysicalFlows, Random, CUDA, HDF5, ProgressMeter
+
 include("parameters.jl")
 include("../core/diagnostics.jl")
 
