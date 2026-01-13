@@ -1,4 +1,4 @@
-using GeophysicalFlows, Random, CUDA, HDF5, ProgressMeter
+using GeophysicalFlows, Random, CUDA, HDF5 
 
 include("parameters.jl")
 include("../core/diagnostics.jl")
@@ -55,14 +55,13 @@ fid = h5open(output_path, "w")
 fid_diag = h5open(diag_path, "w")
 diag = create_dataset(fid_diag, "energy", Float64, (ndata))
 
-p = Progress(ndata, dt=0.1, desc="Progress:", barlen=0, color=:white)
 for nframe in 1:ndata
     stepforward!(prob, nstep)
     write_dataset(fid, "$(nframe)", Array(prob.sol))
     diag[nframe] = FourierFlows.parsevalsum(energy(prob.sol, prob.grid), prob.grid)
-    next!(p)
+    println(nframe)
+    flush(stdout)
 end
-finish!(p)
 
 close(fid_diag)
 close(fid)
