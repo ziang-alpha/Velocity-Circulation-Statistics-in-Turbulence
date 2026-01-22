@@ -1,7 +1,7 @@
 include("../core/core.jl")
 
 # Open all datasets
-DATASETS = [h5open("./output/Re$(Re)N64.h5", "r") for Re in [3.0; 3.5; 4.0]]
+DATASETS = [h5open((@__DIR__) * "/output/Re$(Re)N64.h5", "r") for Re in [3.0; 3.5; 4.0]]
 
 # Build the grid. Modify 'ngrid' for data with different resolution.
 grid = TwoDGrid(CPU(); nx=64, Lx=2π)
