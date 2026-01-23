@@ -82,8 +82,8 @@ prob = TwoDNavierStokes.Problem(dev;
 # Initialize out put file & get the initial value.
 output_path = (@__DIR__) * "/.output/Re$(Re)_N$(ngrid).h5"
 diag_path = (@__DIR__) * "/output/Re$(Re)_N$(ngrid)_diag.h5"
-isdir((@__DIR__) * "/.output/") || mkdir(PATH * "/.output/")
-isdir((@__DIR__) * "/output/") || mkdir(PATH * "/output/")
+isdir((@__DIR__) * "/.output/") || mkdir((@__DIR__) * "/.output/")
+isdir((@__DIR__) * "/output/") || mkdir((@__DIR__) * "/output/")
 if isfile(output_path)
     sol = h5open(output_path, "r") do f
         frames = [parse(Int, k) for k in keys(f)]
