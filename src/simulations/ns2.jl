@@ -1,4 +1,4 @@
-using GeophysicalFlows, Random, CUDA, HDF5, ArgParse
+using GeophysicalFlows, Random, CUDA, HDF5, ArgParse, ProgressMeter
 
 # Parse argument
 aps = ArgParseSettings()
@@ -99,12 +99,10 @@ end
 fid = h5open(output_path, "w")
 fid_diag = h5open(diag_path, "w")
 diag = create_dataset(fid_diag, "energy", Float64, (ndata))
-for nframe in 1:ndata
+@showprogress for nframe in 1:ndata
     stepforward!(prob, nstep)
     write_dataset(fid, "$(nframe)", Array(prob.sol))
     diag[nframe] = FourierFlows.parsevalsum(abs2.(prob.sol) .* prob.grid.invKrsq, prob.grid)
-    println(nframe)
-    flush(stdout)
 end
 close(fid_diag)
 close(fid)
