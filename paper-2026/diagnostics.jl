@@ -1,58 +1,93 @@
-fid = h5open("diagnostics.jl", "w")
-energy_spectra = map(raw_data) do (ζhs, grid, fh)
-    kr = radialk(grid)
-    # Compute the averaged 2D energy spectrum
-    Ehrs = map(ζhs) do ζh
-        Eh = energy(ζh, grid)
-        radialspectrum(Eh, grid)
-    end
-    Ehr_mearsure = measure(Ehrs)
+fid = h5open(args["path"] * "/diagnostics.h5", "w")
 
+catvecArray(x...) = cat(vec.(Array.(x))..., dims = 2)
+
+@time begin
+	@info "Energy spectra."
+	group = create_group(fid, "energy_spectra")
+	for datum in raw_data
+		kr = radialk(datum[:grid])
+		# Compute the averaged 2D energy spectrum
+		Ehrs = map(datum[:ζhs]) do ζh
+			Eh = energy(ζh, datum[:grid])
+			radialspectrum(Eh, datum[:grid])
+		end
+		mean, std = measure(Ehrs)
+		group[datum[:name]] = catvecArray(kr, mean, std)
+	end
 end
 
-energy_fluxes = map(raw_data) do (ζhs, grid, fh)
-    kr = radialk(grid)
-    Fhrs = map(ζhs) do ζh
-        Nh = energyInjectionRate(ζh, grid)
-        cumradialspectrum(Nh, grid)
-    end
-    Fhr_measure = measure(Fhrs)
-    (kr, Fhr_measure)
+@time begin
+	@info "Energy fluxes."
+	group = create_group(fid, "energy_fluxes")
+	for datum in raw_data
+		kr = radialk(datum[:grid])
+		# Compute the averaged 2D energy spectrum
+		Fhrs = map(datum[:ζhs]) do ζh
+			Nh = energyInjectionRate(ζh, datum[:grid])
+			cumradialspectrum(Nh, datum[:grid])
+		end
+		mean, std = measure(Fhrs)
+		group[datum[:name]] = catvecArray(kr, mean, std)
+	end
 end
 
-enstrophy_fluxes = map(raw_data) do (ζhs, grid, fh)
-    kr = radialk(grid)
-    Fhrs = map(ζhs) do ζh
-        Nh = enstrophyInjectionRate(ζh, grid)
-        cumradialspectrum(Nh, grid)
-    end
-    Fhr_measure = measure(Fhrs)
-    (kr, Fhr_measure)
+@time begin
+	@info "Enstrophy fluxes."
+	group = create_group(fid, "enstrophy_fluxes")
+	for datum in raw_data
+		kr = radialk(datum[:grid])
+		# Compute the averaged 2D energy spectrum
+		Fhrs = map(datum[:ζhs]) do ζh
+			Nh = enstrophyInjectionRate(ζh, datum[:grid])
+			cumradialspectrum(Nh, datum[:grid])
+		end
+		mean, std = measure(Fhrs)
+		group[datum[:name]] = catvecArray(kr, mean, std)
+	end
 end
 
-u_pdfs = map(raw_data) do (ζhs, grid, fh)
-    bin = -50:1:50
-    pdfs = map(ζhs) do ζh
-        uh = im * ζh .* grid.invKrsq .* grid.l
-        u = grid.rfftplan \ uh
-        pdf(u, bin)
-    end
-    pdf_measure = measure(pdfs)
-    bc = (bin[1:end-1] .+ bin[2:end]) / 2
-    (bc, pdf_measure)
+@time begin
+	@info "Velocity PDFs."
+	group = create_group(fid, "u_pdfs")
+	for datum in raw_data
+		grid = datum[:grid]
+
+		u0 = grid.rfftplan \ (im * first(datum[:ζhs]) .* grid.invKrsq .* grid.l)
+		umax = maximum(abs.(u0))
+		bin = range(-3*umax, 3*umax, 100)
+		bc = (bin[1:(end-1)] .+ bin[2:end]) / 2
+		
+        pdfs = map(datum[:ζhs]) do ζh
+			uh = im * ζh .* grid.invKrsq .* grid.l
+			u = grid.rfftplan \ uh
+			pdf(u, bin)
+		end
+		mean, std = measure(pdfs)
+		group[datum[:name]] = catvecArray(bc, mean, std)
+	end
 end
 
-u_pdfs_filtered = map(raw_data) do (ζhs, grid, fh)
-    bin = -50:1:50
-    pdfs = map(ζhs) do ζh
-        uh = im * ζh .* grid.invKrsq .* grid.l
-        uh .*= fh
-        u = grid.rfftplan \ uh
-        pdf(u, bin)
-    end
-    pdf_measure = measure(pdfs)
-    bc = (bin[1:end-1] .+ bin[2:end]) / 2
-    (bc, pdf_measure)
+@time begin
+	@info "Large-scale velocity PDF."
+    
+	group = create_group(fid, "u_pdfs_filtered")
+	for datum in raw_data
+		grid = datum[:grid]
+
+        u0 = grid.rfftplan \ (im * first(datum[:ζhs]) .* grid.invKrsq .* grid.l)
+		umax = maximum(abs.(u0))
+		bin = range(-3*umax, 3*umax, 100)
+		bc = (bin[1:(end-1)] .+ bin[2:end]) / 2
+		pdfs = map(datum[:ζhs]) do ζh
+			uh = im * ζh .* grid.invKrsq .* grid.l
+			uh .*= datum[:fh]
+			u = grid.rfftplan \ uh
+			pdf(u, bin)
+		end
+		mean, std = measure(pdfs)
+		group[datum[:name]] = catvecArray(bc, mean, std)
+	end
 end
 
-@save (@__DIR__) * "/diagnostics.jld2" energy_spectra energy_fluxes enstrophy_fluxes u_pdfs u_pdfs_filtered
+close(fid)

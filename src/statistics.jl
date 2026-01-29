@@ -1,4 +1,4 @@
-using CUDA, Measurements
+using CUDA
 # Compute the probability distribution funtion for samples given by an Array
 function pdf(sp::Array, bin)
     pdf = map(bin[1:(end-1)], bin[2:end]) do l, r
@@ -52,5 +52,5 @@ function measure(data_series)
     ndata = length(data_series)
     mean = sum(data_series) / ndata
     var = sum(datum -> (datum - mean) .^ 2, data_series) / ndata^2
-    return mean .± sqrt.(var)
+    return (mean, sqrt.(var))
 end
