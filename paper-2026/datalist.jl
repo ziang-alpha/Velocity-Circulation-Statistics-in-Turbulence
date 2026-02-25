@@ -108,9 +108,9 @@ end
 	for (Re, datum) in rawdata
 		grid = datum.grid
 		dl = 2π / grid.nx
-		loopsizes = (10:10:floor(Int, grid.nx/2)) .* dl
-		squares = [rectsloop(grid, l, l, -π, -π) for l in loopsizes]
-		rects = [rectsloop(grid, 2 * l, l / 2, -π, -π) for l in loopsizes]
+		loopsizes = (10:10:floor(Int, grid.nx/8))
+		squares = [rectsloop(grid, l, l, 1, 1) for l in loopsizes]
+		rects = [rectsloop(grid, 2 * l, l / 2, 1, 1) for l in loopsizes]
 
 		varSquares = map(squares) do hsh
 			vars = map(datum.fζhs) do fζh
@@ -131,7 +131,7 @@ end
 		end
 
 		varRatios = varRects ./ varSquares
-		group["Re$(Re)/x"] = Array(loopsizes)
+		group["Re$(Re)/x"] = Array(loopsizes .* dl)
 		group["Re$(Re)/y"] = Array(Measurements.value.(varRatios))
 		group["Re$(Re)/Δy"] = Array(Measurements.uncertainty.(varRatios))
 	end
@@ -144,9 +144,9 @@ end
 	for (Re, datum) in rawdata
 		grid = datum.grid
 		dl = 2π / grid.nx
-		loopsizes = (10:10:floor(Int, grid.nx/2)) .* dl
-		squares = [rectsloop(grid, l, l, -π, -π) for l in loopsizes]
-		rects = [rectsloop(grid, 8l / 5, 2l / 5, -π, -π) for l in loopsizes]
+		loopsizes = (10:10:floor(Int, grid.nx/8))
+		squares = [rectsloop(grid, l, l, 1, 1) for l in loopsizes]
+		rects = [rectsloop(grid, 8l / 5, 2l / 5, 1, 1) for l in loopsizes]
 
 		varSquares = map(squares) do hsh
 			vars = map(datum.fζhs) do fζh
@@ -167,23 +167,22 @@ end
 		end
 
 		varRatios = varRects ./ varSquares
-		group["Re$(Re)/x"] = Array(loopsizes)
+		group["Re$(Re)/x"] = Array(loopsizes .* dl)
 		group["Re$(Re)/y"] = Array(Measurements.value.(varRatios))
 		group["Re$(Re)/Δy"] = Array(Measurements.uncertainty.(varRatios))
 	end
 end
 
 @time begin
-	Re = 4.0
+	Re = 4.04
 	datum = rawdata[Re]
 	@info "aspect_ratio-moments_ratio:fixed area"
 	group = create_group(pfile, "aspect_ratio-moments_ratio:fixed area")
 
 	grid = datum.grid
-	dl = 2π / grid.nx
-	fixarea = 8100dl^2
-	loopsizes = [15; 20; 30; 40; 45; 60; 90] .* dl
-	rects = [rectsloop(grid, l, fixarea / l, -π, -π) for l in loopsizes]
+	fixarea = 8100
+	loopsizes = [15; 20; 30; 40; 45; 60; 90]
+	rects = [rectsloop(grid, l, fixarea / l, 1, 1) for l in loopsizes]
 	orders = 2:2:10
 
 	HDF5.attributes(group)["area"] = fixarea
@@ -211,10 +210,9 @@ end
 	group = create_group(pfile, "aspect_ratio-moments_ratio:fixed perimeter")
 
 	grid = datum.grid
-	dl = 2π / grid.nx
-	fixperi = 180dl
-	loopsizes = (10:10:90) .* dl
-	rects = [rectsloop(grid, l, fixperi - l, -π, -π) for l in loopsizes]
+	fixperi = 180
+	loopsizes = vec(10:10:90)
+	rects = [rectsloop(grid, l, fixperi - l, 1, 1) for l in loopsizes]
 	orders = 2:2:10
 
 	HDF5.attributes(group)["perimeter"] = fixperi
@@ -229,7 +227,7 @@ end
 			mean ± std
 		end
 		y_mea = momRects ./ last(momRects)
-		group["Re$(Re) order$(order)/x"] = Array(loopsizes .^ 2 ./ fixarea)
+		group["Re$(Re) order$(order)/x"] = Array(loopsizes ./ (fixperi .- loopsizes))
 		group["Re$(Re) order$(order)/y"] = Array(Measurements.value.(y_mea))
 		group["Re$(Re) order$(order)/Δy"] = Array(Measurements.uncertainty.(y_mea))
 	end

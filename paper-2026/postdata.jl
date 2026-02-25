@@ -13,7 +13,7 @@ aps = ArgParseSettings()
 	help = "Mode of the output .h5 file."
 	arg_type = String
 	default = "w"
-    "--gpu"
+	"--gpu"
 	help = "Using GPU acceleration."
 	action = :store_true
 end
@@ -27,20 +27,19 @@ rfiles = map(filenames) do name
 end
 
 rawdata = map(rfiles, filenames) do fid, name
-	ζhs = begin
-		nframe = maximum(parse.(Int, keys(fid)))
-		Iterators.map(1:nframe) do n
-			ζh = read(fid, "$(n)")
-			device_array(dev)(ζh)
-		end
-	end
-	regex = r"Re(\d+\.\d+)_N(\d+)\.h5"
-	m = match(regex, name)
+	m = match(r"Re(\d+\.\d+)_N(\d+)\.h5", name)
 	Re, N = parse(Float64, m[1]), parse(Int, m[2])
 	grid = TwoDGrid(dev; nx = N, Lx = 2π)
+
+	ζhs = Iterators.map(fid) do ds
+		ζh = read(ds)
+		device_array(dev)(ζh)
+	end
+	
 	fh = device_array(dev)(float(grid.Krsq .< (N / 3sqrt(Re) - 5)^2))
-	fζhs = Iterators.map(ζhs) do ζh
-		ζh .* fh
+	fζhs = Iterators.map(fid) do ds
+		ζh = read(ds) .* fh
+		device_array(dev)(ζh)
 	end
 
 	Re => (ζhs = ζhs, fζhs = fζhs, grid = grid)

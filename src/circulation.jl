@@ -14,7 +14,11 @@ function rectsloop(grid, heights, widths, startxs, startys)
 
 end
 
-rectangle(height::Int, width::Int, startx::Int, starty::Int, grid) = @. (0 ≤ ((1:grid.nx)-startx) ≤ width-1) && (0 ≤ ((1:grid.ny)-starty)' ≤ height-1)
+function rectangle(height::Int, width::Int, startx::Int, starty::Int, grid)
+	x = Bool.(vcat(zeros(startx-1), ones(width), zeros(grid.nx+1-startx-width)))
+	y = Bool.(vcat(zeros(starty-1), ones(height), zeros(grid.ny+1-starty-height)))
+	return x .&& transpose(y)
+end
 
 """
 	Compute the velocity circulation
