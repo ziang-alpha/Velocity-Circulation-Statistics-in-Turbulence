@@ -1,7 +1,7 @@
 using HDF5, ArgParse, Measurements
-include((@__DIR__) * "/../src/circulation.jl")
-include((@__DIR__) * "/../src/diagnostics.jl")
-include((@__DIR__) * "/../src/statistics.jl")
+include((@__DIR__) * "/../src/postproc/circulation.jl")
+include((@__DIR__) * "/../src/postproc/diagnostics.jl")
+include((@__DIR__) * "/../src/postproc/statistics.jl")
 
 aps = ArgParseSettings()
 @add_arg_table! aps begin

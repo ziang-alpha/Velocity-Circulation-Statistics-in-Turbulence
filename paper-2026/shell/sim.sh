@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --gpus=1
-#SBATCH --output=sim%j.out
-#SBATCH --error=sim%j.err
+#SBATCH --output=sout/sim%j.out
+#SBATCH --error=sout/sim%j.err
 #SBATCH --export=ALL
 
 module load cuda/12.9
