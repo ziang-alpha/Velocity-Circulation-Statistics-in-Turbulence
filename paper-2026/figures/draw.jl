@@ -137,7 +137,6 @@ with_theme(mytheme) do
 			xref = x[4:300]
 			eqSpec(x) = @. 2π * x / (α + β * x^2)
 			lines!(axa, xref, eqSpec(xref); linestyle = :dashdot, color = :black)
-			scatter!(axa,sqrt(α/β),eqSpec(sqrt(α/β)); color = :black)
 		end
 	end
 	lines!(axa, 2:64, 2e-6 .* (2:64); linestyle = :dash, color = :red)
@@ -178,7 +177,7 @@ with_theme(mytheme) do
 		nbanks = 4,
 		orientation = :horizontal,
 	)
-	save((@__DIR__) * "/figures/diag.pdf", fig)
+	save((@__DIR__) * "/diag.pdf", fig)
 end
 
 ## Figure 2
