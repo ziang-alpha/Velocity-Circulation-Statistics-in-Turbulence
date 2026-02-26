@@ -135,8 +135,9 @@ with_theme(mytheme) do
 		lines!(axa, x, y; color = c)
 		if α > 0 && β > 0
 			xref = x[4:300]
-			yref = @. 2π * xref / (α + β * xref^2)
-			lines!(axa, xref, yref; linestyle = :dashdot, color = :black)
+			eqSpec(x) = @. 2π * x / (α + β * x^2)
+			lines!(axa, xref, eqSpec(xref); linestyle = :dashdot, color = :black)
+			scatter!(axa,sqrt(α/β),eqSpec(sqrt(α/β)); color = :black)
 		end
 	end
 	lines!(axa, 2:64, 2e-6 .* (2:64); linestyle = :dash, color = :red)
@@ -177,7 +178,7 @@ with_theme(mytheme) do
 		nbanks = 4,
 		orientation = :horizontal,
 	)
-	save((@__DIR__) * "/fig1.pdf", fig)
+	save((@__DIR__) * "/figures/diag.pdf", fig)
 end
 
 ## Figure 2
