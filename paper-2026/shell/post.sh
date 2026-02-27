@@ -7,4 +7,4 @@
 module load cuda/12.9
 julia --project=~/run/TurbCircStat\
 	~/run/TurbCircStat/paper-2026/figures/getdata.jl\
-    -p ~/run -m "w"
+    -p ~/run -m "w" --gpu

@@ -16,7 +16,7 @@ end
 " Cumulative radial spectrum from given 2D spectrum "
 cumradialspectrum(fh, grid) = begin
 	kr, fhr = FourierFlows.radialspectrum(fh, grid; refinement = 1)
-	cumsum(fhr) .* (kr[2] - kr[1])
+	cumsum(vec(fhr)) .* (kr[2] - kr[1])
 end
 
 # Diagnostic Quantities for 2D Navier Stokes equations
