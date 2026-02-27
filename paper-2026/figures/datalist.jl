@@ -108,7 +108,7 @@ end
 	for (Re, datum) in rawdata
 		grid = datum.grid
 		dl = 2π / grid.nx
-		loopsizes = (10:10:floor(Int, grid.nx/8))
+		loopsizes = (10:10:floor(Int, grid.nx/2))
 		squares = [rectsloop(grid, l, l, 1, 1) for l in loopsizes]
 		rects = [rectsloop(grid, 2 * l, l ÷ 2, 1, 1) for l in loopsizes]
 
@@ -144,7 +144,7 @@ end
 	for (Re, datum) in rawdata
 		grid = datum.grid
 		dl = 2π / grid.nx
-		loopsizes = (10:10:floor(Int, grid.nx/8))
+		loopsizes = (10:10:floor(Int, grid.nx/2))
 		squares = [rectsloop(grid, l, l, 1, 1) for l in loopsizes]
 		rects = [rectsloop(grid, 8l ÷ 5, 2l ÷ 5, 1, 1) for l in loopsizes]
 
